@@ -16,38 +16,37 @@ def get_connection():
         st.error(f"Error connecting to the database: {err}")
         return None  # Return None if there is an error
 
-# Fetch the list of countries based on the selected region
+
 def fetch_countries(region):
     connection = get_connection()
     if connection is None:
-        return []  # Return an empty list if no connection is available
+        return []  
 
     try:
         cursor = connection.cursor()
-        # Query to get countries from the selected region
         cursor.execute("SELECT TRIM(country), TRIM(region) FROM sample_world WHERE TRIM(region) = %s;", (region,))
-        countries = cursor.fetchall()  # Fetch all the countries for the selected region
+        countries = cursor.fetchall() 
         return countries
     except mysql.connector.Error as err:
         st.error(f"Error fetching countries: {err}")
-        return []  # Return an empty list if there is an error
+        return []  
     finally:
         cursor.close()
-        connection.close()  # Close the connection after use
+        connection.close() 
 
 # Streamlit page layout and functionality
 st.title("View Countries by Region")
 
-# Fetch the list of regions from the database
+
 connection = get_connection()
 if connection:
     cursor = connection.cursor()
-    cursor.execute("SELECT DISTINCT TRIM(region) FROM sample_world;")  # Get unique regions
-    regions = [region[0] for region in cursor.fetchall()]  # Store regions in a list
+    cursor.execute("SELECT DISTINCT TRIM(region) FROM sample_world;")  
+    regions = [region[0] for region in cursor.fetchall()] 
     cursor.close()
     connection.close()
 
-# If regions are available, show them in a dropdown
+
 if regions:
     selected_region = st.selectbox("Type to search", ["Type to search"] + regions)
 
@@ -56,7 +55,7 @@ if regions:
         countries = fetch_countries(selected_region)
 
         if countries:
-            # Display the list of countries for the selected region
+           
             for country, region in countries:
                 st.write(f"- {country} ({region})")
 
